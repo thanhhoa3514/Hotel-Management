@@ -1,0 +1,48 @@
+---
+description: The 7-step process for deploying production code, emphasizing the strategic integration points for AI.
+globs:
+  - "**"
+alwaysApply: false
+---
+
+# 7-Step Workflow: Leveraging AI for Prod Code
+
+This outlines the process from initial design to production deployment, detailing the steps and AI's role.
+
+## 1. Technical Design Document (TDD)
+
+- Always start with a TDD.
+- The TDD originates from a proposal doc.
+- Once stakeholders agree on the proposal's merit, develop the full system design (architecture, team integrations, etc.).
+
+## 2. Design Review
+
+- Conduct a Design Review before starting development.
+- The team's design document must be rigorously reviewed ("shredded") by Senior Engineers.
+- **Goal:** Front-load the pain by identifying major issues early.
+
+## 3. Launch Development Effort
+
+- Upon passing the review, initiate development.
+- The first few weeks are dedicated to creating more documentation for each subsystem, to be built by individual development teams.
+
+## 4. Backlog Development and Sprint Planning
+
+- Devs collaborate with PMs (Product Managers) and TPMs (Technical Program Managers) to define discrete tasks and their order for individual developers.
+
+## 5. Software Development
+
+- Hands on keyboard; start crushing task tickets.
+- **AI as a Force Multiplier:** AI agents are used strategically here.
+- Using **Test Driven Development (TDD)**: The AI coding agent must **write the tests first** for the feature being built.
+- Only after the tests are written, the AI agent is used to **build out the feature** itself.
+
+## 6. Code Submission Review
+
+- Enforce a **two-developer approval process** before code is merged into the main branch.
+- **AI's Role:** AI shows great promise in assisting with the code review process.
+
+## 7. Test in Staging
+
+- Code is deployed and tested in the staging environment.
+- If staging is confirmed "good to go," the code is pushed to production (`prod`).

@@ -1,0 +1,169 @@
+---
+alwaysApply: true
+---
+
+## 📘 I. Project Overview
+
+The **Hotel Management System** is designed to streamline hotel operations, including room management, reservations, payments, and auditing. The backend is developed in **Java 17**, integrated with **Keycloak** for authentication and user management.
+
+### 🎯 Objectives
+
+- Simplify hotel operations for staff and admins.
+- Enable customers to book, cancel, and pay for rooms online.
+- Provide robust auditing and security logging.
+- Ensure scalability and modularity using modern Java backend practices.
+
+### 🧩 Technologies Used
+
+| Category            | Technology                         |
+| ------------------- | ---------------------------------- |
+| Backend             | Java 17 (Spring Boot)              |
+| Database            | PostgreSQL                         |
+| Authentication      | Keycloak (OpenID Connect / OAuth2) |
+| ORM                 | Hibernate / JPA                    |
+| Logging             | SLF4J + Audit Log Table            |
+| Frontend (optional) | React                              |
+|                     |
+
+---
+
+## 🧱 II. Database Schema (dbdiagram.io Format)
+
+```sql
+table users {
+  id int [pk, increment]
+  username varchar(100)
+  email varchar(150)
+  password varchar(255)
+  role varchar(50)
+  created_at datetime
+  updated_at datetime
+}
+
+table guests {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  full_name varchar(100)
+  phone varchar(20)
+  address text
+}
+
+table staff {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  full_name varchar(100)
+  position varchar(50)
+  department varchar(50)
+}
+
+table rooms {
+  id int [pk, increment]
+  room_number varchar(20)
+  room_type varchar(50)
+  price decimal(10,2)
+  status varchar(30)
+  description text
+}
+
+table reservations {
+  id int [pk, increment]
+  guest_id int [ref: > guests.id]
+  room_id int [ref: > rooms.id]
+  check_in date
+  check_out date
+  total_price decimal(10,2)
+  status varchar(50)
+  created_at datetime
+}
+
+table payments {
+  id int [pk, increment]
+  reservation_id int [ref: > reservations.id]
+  payment_method varchar(50)
+  amount decimal(10,2)
+  payment_date datetime
+  status varchar(30)
+}
+
+table invoices {
+  id int [pk, increment]
+  payment_id int [ref: > payments.id]
+  invoice_number varchar(50)
+  issued_date datetime
+  total_amount decimal(10,2)
+}
+
+table audit_logs {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  user_role varchar(50)
+  action varchar(100)
+  entity varchar(100)
+  entity_id int
+  description text
+  status varchar(20)
+  ip_address varchar(50)
+  timestamp datetime
+}
+
+// Keycloak handles authentication, user registration, and login events.
+```
+
+---
+
+## 🔁 III. Development Flow (Backend - Java 17)
+
+### 1️⃣ Authentication Flow (Keycloak)
+
+1. User registers or logs in via Keycloak.
+2. Keycloak issues JWT token → Backend verifies token using Keycloak adapter.
+3. User profile is mapped to `users` table for local data tracking.
+
+### 2️⃣ Core Functional Flow
+
+| Step | From         | To             | Description                                    |
+| ---- | ------------ | -------------- | ---------------------------------------------- |
+| 1    | users        | guests / staff | Link user account to specific role.            |
+| 2    | rooms        | reservations   | Guest selects and reserves room.               |
+| 3    | reservations | payments       | Payment created upon reservation confirmation. |
+| 4    | payments     | invoices       | Once payment success, invoice is issued.       |
+| 5    | all entities | audit_logs     | Every CRUD action recorded in audit_logs.      |
+
+### 3️⃣ Admin & Staff Access
+
+- **Admin:** Full CRUD access + audit log review.
+- **Staff:** Manage reservations, rooms, and payments.
+- **Guest:** Limited access (own reservations, payments).
+
+### 4️⃣ Exception Handling & Logging
+
+- Use Spring AOP for centralized audit logging.
+- Store logs both in `audit_logs` and via external monitoring (e.g., ELK stack if extended).
+
+---
+
+## 🧠 IV. Key Project Rules
+
+| Category       | Rule                                                                |
+| -------------- | ------------------------------------------------------------------- |
+| Authentication | All auth handled via Keycloak (no manual login API).                |
+| Data Integrity | Every reservation requires valid guest + room reference.            |
+| Payments       | Invoice generated automatically upon payment success.               |
+| Auditing       | All create/update/delete operations logged in `audit_logs`.         |
+| Security       | JWT validation middleware must protect all APIs except public ones. |
+| Roles          | Admin > Staff > Guest (permission hierarchy).                       |
+
+## -- you should implement it after finish the basic system
+
+## 📋 V. Future Enhancements
+
+- Add Room Service Module.
+- Integrate Notification Service (Email/SMS).
+- Add Rate Limiting for API security.
+- Implement ELK or Grafana dashboard for audit analytics.
+
+---
+
+## 🏁 VI. Summary
+
+This document outlines the **core architecture, database structure, and rule definitions** for the Hotel Management System. The design ensures scalability, modularity, and enterprise-grade auditing using Java 17, Keycloak, and SQL-based persistence.
